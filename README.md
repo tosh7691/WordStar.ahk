@@ -1,5 +1,5 @@
 # emacs.ahk 
-This tiny script allows you to use the emacs-like key bindings on Windows, which is written in AutoHotkey (AHK) language. The maintainer has used this script since 2007 and has verified that it works effectively for various kinds of applications.
+This tiny script allows you to use the WordStar-like key bindings on Windows, which is written in AutoHotkey (AHK) language. The maintainer has used this script since 2007 and has verified that it works effectively for various kinds of applications.
 
 ## Supported keybindings
 <table>
