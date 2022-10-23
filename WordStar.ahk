@@ -1,5 +1,5 @@
 ;;
-;; An autohotkey script that provides emacs-like keybinding on Windows
+;; An autohotkey script that provides WordStar-like keybinding on Windows
 ;;
 #InstallKeybdHook
 #UseHook
@@ -19,30 +19,66 @@ is_marked = 0
 is_target()
 {
   IfWinActive,ahk_class ConsoleWindowClass ; Cygwin
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class mintty ; Cygwin
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class MEADOW ; Meadow
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class cygwin/x X rl-xterm-XTerm-0
+  {
+    Send %A_ThisHotkey%
     Return 1
-  IfWinActive,ahk_class MozillaUIWindowClass ; keysnail on Firefox
-    Return 1
+  }
+;  IfWinActive,ahk_class MozillaUIWindowClass ; keysnail on Firefox
+;  {
+;    Send %A_ThisHotkey%
+;    Return 1
+;  }
   ; Avoid VMwareUnity with AutoHotkey
-  IfWinActive,ahk_class VMwareUnityHostWndClass
-    Return 1
+;  IfWinActive,ahk_class VMwareUnityHostWndClass
+;  {
+;    Send %A_ThisHotkey%
+;    Return 1
+;  }
   IfWinActive,ahk_class Vim ; GVIM
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class SWT_Window0 ; Eclipse
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class Xming X
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class SunAwtFrame
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class Emacs ; NTEmacs
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   IfWinActive,ahk_class XEmacs ; XEmacs on Cygwin
+  {
+    Send %A_ThisHotkey%
     Return 1
+  }
   Return 0
 }
 
@@ -166,7 +202,15 @@ hunt_backward()
   global is_pre_q  = 0
   Return
 }
-
+replace()
+{
+  IfWinActive,ahk_exe sakura.exe
+    Send ^r
+  Else
+    Send ^h
+  global is_pre_q  = 0
+  Return
+}
 
 kill_region()
 {
@@ -198,7 +242,7 @@ undo()
 find_file()
 {
   Send ^o
-  global is_pre_K  = 0
+  global is_pre_k  = 0
   Return
 }
 save_buffer()
@@ -363,22 +407,18 @@ goto_line()
 }
 
 ^a::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
     Else If is_pre_q
-      global is_pre_q = 0
+      replace()
     Else
       backward_word()
   }
   return
 ^b::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
     {
@@ -388,9 +428,7 @@ goto_line()
   }
   return
 ^c::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       yank()
@@ -401,9 +439,7 @@ goto_line()
   }
   return
 ^d::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -413,10 +449,21 @@ goto_line()
       forward_char()
   }
   return
+^+d::
+  If !is_target()
+  {
+    global is_marked =1
+    If is_pre_k
+      global is_pre_k = 0
+    Else If is_pre_q
+      move_end_of_line()
+    Else
+      forward_char()
+    global is_marked =0
+  }
+  return
 ^e::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -426,10 +473,21 @@ goto_line()
       previous_line()
   }
   return
+^+e::
+  If !is_target()
+  {
+    global is_marked = 1
+    If is_pre_k
+      global is_pre_k = 0
+    Else If is_pre_q
+      global is_pre_q = 0
+    Else
+      previous_line()
+    global is_marked = 0
+  }
+  return
 ^f::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -439,10 +497,32 @@ goto_line()
       forward_word()
   }
   return
+^+f::
+  If !is_target()
+  {
+    global is_marked = 1
+    If is_pre_k
+      global is_pre_k = 0
+    Else If is_pre_q
+      isearch_forward()
+    Else
+      forward_word()
+    global is_marked = 0
+  }
+  return
+f::
+  If !is_target()
+  {
+    If is_pre_k
+      global is_pre_k = 0
+    Else If is_pre_q
+      isearch_backward()
+    Else
+      Send %A_ThisHotkey%
+  }
+  return
 ^g::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -453,9 +533,7 @@ goto_line()
   }
   return
 ^h::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -466,9 +544,7 @@ goto_line()
   }
   return
 ^i::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -479,9 +555,7 @@ goto_line()
   }
   Return
 ^j::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -492,9 +566,7 @@ goto_line()
   }
   Return
 ^k::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       Kill_ring_save()
@@ -505,9 +577,7 @@ goto_line()
   }
   Return
 ^l::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -518,9 +588,7 @@ goto_line()
   }
   Return
 ^m::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -530,10 +598,30 @@ goto_line()
       newline()
   }
   Return
+^n::
+  If !is_target()
+  {
+    If is_pre_k
+      global is_pre_k = 0
+    Else If is_pre_q
+      global is_pre_k = 0
+    Else
+      newline_and_indent()
+  }
+  Return
+^o::
+  If !is_target()
+  {
+    If is_pre_k
+      find_file()
+    Else If is_pre_q
+      global is_pre_q = 0
+    Else
+      Send %A_ThisHotkey%
+  }
+  Return
 ^q::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       kill_emacs()
@@ -544,9 +632,7 @@ goto_line()
   }
   Return
 ^r::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       kill_emacs()
@@ -556,10 +642,21 @@ goto_line()
       page_up()
   }
   Return
+^+r::
+  If !is_target()
+  {
+    global is_marked =1
+    If is_pre_k
+      kill_emacs()
+    Else If is_pre_q
+      move_beginning_of_file()
+    Else
+      page_up()
+    global is_marked =0
+  }
+  Return
 ^s::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       save_buffer()
@@ -569,10 +666,21 @@ goto_line()
       backward_char()
   }
   Return
+^+s::
+  If !is_target()
+  {
+    global is_marked = 1
+    If is_pre_k
+      save_buffer()
+    Else If is_pre_q
+      move_beginning_of_line()
+    Else
+      backward_char()
+    global is_marked = 0
+  }
+  Return
 ^t::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -583,9 +691,7 @@ goto_line()
   }
   Return
 ^u::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -596,9 +702,7 @@ goto_line()
   }
   Return
 ^v::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
@@ -609,9 +713,7 @@ goto_line()
   }
   Return
 ^w::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       save_buffer()
@@ -622,9 +724,7 @@ goto_line()
   }
   Return
 ^x::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       kill_emacs()
@@ -634,10 +734,21 @@ goto_line()
       next_line()
   }
   Return
+^+x::
+  If !is_target()
+  {
+    global is_marked = 1
+    If is_pre_k
+      kill_emacs()
+    Else If is_pre_q
+      global is_pre_q = 0
+    Else
+      next_line()
+    global is_marked = 0
+  }
+  Return
 ^y::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       kill_region()
@@ -648,9 +759,7 @@ goto_line()
   }
   Return
 ^z::
-  If is_target()
-    Send %A_ThisHotkey%
-  Else
+  If !is_target()
   {
     If is_pre_k
       global is_pre_k = 0
