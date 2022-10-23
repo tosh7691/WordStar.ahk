@@ -13,11 +13,19 @@ is_pre_k = 0
 is_pre_q = 0
 ; turns to be 1 when ctrl-k ctrl-b is pressed
 is_marked = 0
+; turns to be 1 when ctrl-\ is pressed
+is_send_as_is = 0
 
 ; Applications you want to disable emacs-like keybindings
 ; (Please comment out applications you don't use)
 is_target()
 {
+  If is_send_as_is
+  {
+    Send %A_ThisHotkey%
+    is_send_as_is = 0
+    Return 1
+  }
   IfWinActive,ahk_class ConsoleWindowClass ; Cygwin
   {
     Send %A_ThisHotkey%
@@ -204,7 +212,7 @@ hunt_backward()
 }
 replace()
 {
-  IfWinActive,ahk_exe sakura.exe
+  if WinActive("sakura.exe")
     Send ^r
   Else
     Send ^h
@@ -767,5 +775,13 @@ f::
       global is_pre_q = 0
     Else
       scroll_down()
+  }
+  Return
+^\::
+  If !is_target()
+  {
+    global is_pre_k = 0
+    global is_pre_q = 0
+    global is_send_as_is = 1
   }
   Return

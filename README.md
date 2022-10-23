@@ -165,4 +165,8 @@ This tiny script allows you to use the WordStar-like key bindings on Windows, wh
 <td>C-z</td>
 <td>scroll down</td>
 </tr>
+<tr>
+<td>C-\</td>
+<td>send next key as is</td>
+</tr>
 </table>
